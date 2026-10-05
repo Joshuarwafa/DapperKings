@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog | Dapper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ef;
+    --surface: #ffffff;
+    --ink: #1c1a17;
+    --muted: #7a736a;
+    --line: #e4ddd2;
+    --accent: #a8865a;
+    --dark: #151412;
+    --serif: "Cormorant Garamond", Georgia, serif;
+    --sans: "Jost", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-weight: 300; font-size: 16px; line-height: 1.75; }
+  img { max-width: 100%; display: block; }
+  a { color: inherit; text-decoration: none; transition: color .25s; }
+  a:hover { color: var(--accent); }
+  .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 768px) { .container { padding: 0 40px; } }
+
+  /* ---------- Header ---------- */
+  .site-header { position: sticky; top: 0; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 88px; }
+  .logo { font-family: var(--serif); font-size: 34px; font-weight: 500; letter-spacing: 3px; text-transform: uppercase; }
+  .logo span { color: var(--accent); }
+  .main-nav ul { list-style: none; display: flex; gap: 40px; }
+  .main-nav a { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; font-weight: 400; position: relative; padding: 6px 0; }
+  .main-nav a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 1px; background: var(--accent); transition: width .3s; }
+  .main-nav a:hover::after, .main-nav a.active::after { width: 100%; }
+  .main-nav a.active { color: var(--accent); }
+  .header-actions { display: flex; align-items: center; gap: 22px; }
+  .icon-btn { background: none; border: 0; cursor: pointer; color: var(--ink); display: inline-flex; padding: 4px; }
+  .icon-btn svg { width: 20px; height: 20px; }
+  .menu-toggle { display: none; }
+  @media (max-width: 960px) {
+    .menu-toggle { display: inline-flex; }
+    .main-nav { position: absolute; top: 88px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--line); max-height: 0; overflow: hidden; transition: max-height .35s; }
+    .main-nav.open { max-height: 400px; }
+    .main-nav ul { flex-direction: column; gap: 0; padding: 12px 16px 24px; }
+    .main-nav li a { display: block; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .header-inner { height: 72px; }
+    .main-nav { top: 72px; }
+    .logo { font-size: 28px; }
+  }
+
+  /* ---------- Page title ---------- */
+  .page-title { position: relative; padding: 110px 0 100px; text-align: center; color: #fff; background: var(--dark) center 30% / cover no-repeat; }
+  .page-title::before { content: ""; position: absolute; inset: 0; background: rgba(15, 13, 11, .62); }
+  .page-title .container { position: relative; }
+  .page-title h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(44px, 7vw, 80px); line-height: 1.05; letter-spacing: 1px; }
+  .breadcrumb { margin-top: 18px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.75); }
+  .breadcrumb a:hover { color: #fff; }
+  .breadcrumb .sep { margin: 0 10px; color: var(--accent); }
+
+  /* ---------- Layout ---------- */
+  .blog-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 70px; padding: 110px 0 120px; }
+  @media (max-width: 1100px) { .blog-wrap { grid-template-columns: minmax(0, 1fr) 300px; gap: 48px; } }
+  @media (max-width: 900px) { .blog-wrap { grid-template-columns: 1fr; padding: 64px 0 80px; gap: 72px; } }
+
+  /* ---------- Posts ---------- */
+  .post { margin-bottom: 90px; }
+  .post:last-of-type { margin-bottom: 60px; }
+  .post-media { position: relative; overflow: hidden; display: block; aspect-ratio: 16 / 10; background: var(--line); }
+  .post-media img { width: 100%; height: 100%; object-fit: cover; transition: transform .8s ease; }
+  .post-media:hover img { transform: scale(1.04); }
+  .post-media .date-badge { position: absolute; left: 0; bottom: 0; background: var(--bg); padding: 14px 20px; text-align: center; line-height: 1; }
+  .date-badge .d { display: block; font-family: var(--serif); font-size: 34px; font-weight: 500; }
+  .date-badge .m { display: block; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .post-body { padding-top: 34px; }
+  .post-meta { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .post-meta a { color: var(--accent); }
+  .post-meta span + span::before { content: "/"; margin-right: 22px; color: var(--line); }
+  .post-title { font-family: var(--serif); font-weight: 500; font-size: clamp(30px, 4vw, 42px); line-height: 1.15; margin: 14px 0 18px; }
+  .post-excerpt { color: #4b463f; max-width: 760px; }
+  .read-more { display: inline-flex; align-items: center; gap: 14px; margin-top: 26px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; }
+  .read-more::after { content: ""; width: 40px; height: 1px; background: currentColor; transition: width .3s; }
+  .read-more:hover::after { width: 60px; }
+
+  .post--quote { background: var(--dark); color: #fff; padding: 64px 56px; position: relative; }
+  .post--quote::before { content: "\201C"; position: absolute; top: 10px; left: 30px; font-family: var(--serif); font-size: 140px; line-height: 1; color: var(--accent); opacity: .5; }
+  .post--quote blockquote { position: relative; font-family: var(--serif); font-style: italic; font-size: clamp(24px, 3vw, 32px); line-height: 1.35; }
+  .post--quote cite { display: block; margin-top: 22px; font-style: normal; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); }
+  @media (max-width: 600px) { .post--quote { padding: 48px 24px; } }
+
+  .pagination { display: flex; gap: 10px; align-items: center; }
+  .pagination a, .pagination span { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--line); font-size: 14px; }
+  .pagination .current { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .pagination a:hover { border-color: var(--accent); }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar { display: flex; flex-direction: column; gap: 56px; }
+  .widget-title { font-family: var(--serif); font-weight: 500; font-size: 26px; margin-bottom: 26px; padding-bottom: 14px; border-bottom: 1px solid var(--line); position: relative; }
+  .widget-title::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 50px; height: 1px; background: var(--accent); }
+
+  .author-widget { text-align: center; background: var(--surface); padding: 40px 30px; }
+  .author-widget img { width: 130px; height: 130px; object-fit: cover; object-position: top; border-radius: 50%; margin: 0 auto 20px; }
+  .author-widget h4 { font-family: var(--serif); font-size: 26px; font-weight: 500; }
+  .author-widget .role { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+  .author-widget p { margin-top: 14px; color: #4b463f; font-size: 15px; }
+  .socials { display: flex; justify-content: center; gap: 18px; margin-top: 20px; }
+  .socials a { font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+  .socials a:hover { color: var(--accent); }
+
+  .search-form { display: flex; border-bottom: 1px solid var(--ink); }
+  .search-form input { flex: 1; min-width: 0; border: 0; background: transparent; padding: 12px 0; font: inherit; font-size: 15px; color: var(--ink); outline: none; }
+  .search-form button { background: none; border: 0; cursor: pointer; color: var(--ink); }
+
+  .popular-list { list-style: none; display: flex; flex-direction: column; gap: 22px; }
+  .popular-list li { display: grid; grid-template-columns: 84px 1fr; gap: 18px; align-items: center; }
+  .popular-list img { width: 84px; height: 84px; object-fit: cover; object-position: top; }
+  .popular-list h5 { font-family: var(--serif); font-size: 19px; font-weight: 500; line-height: 1.25; }
+  .popular-list time { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+  .cat-list { list-style: none; }
+  .cat-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 15px; }
+  .cat-list li span { color: var(--muted); font-size: 13px; }
+
+  .newsletter { background: var(--dark); color: #fff; padding: 40px 30px; }
+  .newsletter .widget-title { border-color: rgba(255,255,255,.15); }
+  .newsletter p { font-size: 15px; color: rgba(255,255,255,.7); margin-bottom: 20px; }
+  .newsletter input { width: 100%; padding: 14px 16px; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #fff; font: inherit; font-size: 14px; outline: none; }
+  .newsletter input:focus { border-color: var(--accent); }
+  .btn { display: inline-block; width: 100%; margin-top: 12px; padding: 14px 20px; background: var(--accent); color: #fff; border: 0; font: inherit; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; font-weight: 500; cursor: pointer; transition: background .25s; }
+  .btn:hover { background: #8f714b; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tags a { padding: 6px 14px; border: 1px solid var(--line); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .tags a:hover { border-color: var(--accent); }
+
+  .archive-list { list-style: none; }
+  .archive-list li { padding: 8px 0; font-size: 15px; }
+
+  /* ---------- Instagram strip ---------- */
+  .insta-strip { display: grid; grid-template-columns: repeat(6, 1fr); }
+  .insta-strip a { position: relative; aspect-ratio: 1; overflow: hidden; }
+  .insta-strip img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform .6s, opacity .3s; }
+  .insta-strip a:hover img { transform: scale(1.06); opacity: .8; }
+  @media (max-width: 700px) { .insta-strip { grid-template-columns: repeat(3, 1fr); } }
+
+  /* ---------- Footer ---------- */
+  .site-footer { background: var(--dark); color: rgba(255,255,255,.7); padding: 100px 0 0; font-size: 15px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.3fr; gap: 48px; padding-bottom: 80px; }
+  @media (max-width: 960px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .footer-grid { grid-template-columns: 1fr; } }
+  .site-footer .logo { color: #fff; display: inline-block; margin-bottom: 18px; }
+  .site-footer h6 { font-family: var(--serif); font-size: 22px; font-weight: 500; color: #fff; margin-bottom: 20px; }
+  .site-footer ul { list-style: none; }
+  .site-footer li { padding: 4px 0; }
+  .site-footer a:hover { color: var(--accent); }
+  .footer-news { display: flex; border-bottom: 1px solid rgba(255,255,255,.3); margin-top: 8px; }
+  .footer-news input { flex: 1; min-width: 0; background: transparent; border: 0; padding: 12px 0; color: #fff; font: inherit; outline: none; }
+  .footer-news button { background: none; border: 0; color: var(--accent); font: inherit; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); padding: 26px 0; display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; font-size: 13px; }
+
+  .to-top { position: fixed; right: 24px; bottom: 24px; width: 46px; height: 46px; background: var(--ink); color: #fff; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .3s; z-index: 40; }
+  .to-top.show { opacity: 1; pointer-events: auto; }
+  .to-top:hover { background: var(--accent); color: #fff; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">Dapp<span>e</span>r</a>
+    <nav class="main-nav" id="mainNav">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Collections</a></li>
+        <li><a href="blog.html" class="active">Blog</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-actions">
+      <a href="#search" class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </a>
+      <a href="#" class="icon-btn" aria-label="Book an appointment">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      </a>
+      <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h18M3 12h18M3 17h18"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Page title -->
+<section class="page-title" style="background-image:url('Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.51.19.jpeg')">
+  <div class="container">
+    <h1>Blog Right Sidebar</h1>
+    <div class="breadcrumb"><a href="index.html">Home</a><span class="sep">/</span>Blog</div>
+  </div>
+</section>
+
+<!-- Main -->
+<div class="container">
+  <div class="blog-wrap">
+
+    <main>
+      <article class="post">
+        <a href="#" class="post-media">
+          <img src="Pictures/tailored suit/Cover.jpeg" alt="Man in navy pinstripe double-breasted suit with camel overcoat" style="object-position:center 25%">
+          <div class="date-badge"><span class="d">12</span><span class="m">Aug 2026</span></div>
+        </a>
+        <div class="post-body">
+          <div class="post-meta"><span><a href="#">Tailoring</a></span><span>By Dapper</span><span>4 Comments</span></div>
+          <h2 class="post-title"><a href="#">Design your own suit</a></h2>
+          <p class="post-excerpt">From the first measurement to the final fitting, a bespoke suit is a conversation between you and your tailor. We walk through choosing cloth, lapel width, button stance and the small details — like a camel overcoat thrown over navy pinstripe — that make a suit unmistakably yours.</p>
+          <a href="#" class="read-more">Read More</a>
+        </div>
+      </article>
+
+      <article class="post">
+        <a href="#" class="post-media">
+          <img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.51.19.jpeg" alt="Groom and groomsmen in tuxedos on steps" style="object-position:center 35%">
+          <div class="date-badge"><span class="d">03</span><span class="m">Sep 2026</span></div>
+        </a>
+        <div class="post-body">
+          <div class="post-meta"><span><a href="#">Weddings</a></span><span>By Dapper</span><span>2 Comments</span></div>
+          <h2 class="post-title"><a href="#">Black tie for the groom &amp; his men</a></h2>
+          <p class="post-excerpt">A white dinner jacket for the groom, shawl-collar black for the groomsmen. Here's how to coordinate a wedding party so everyone looks sharp in photos — without everyone looking identical.</p>
+          <a href="#" class="read-more">Read More</a>
+        </div>
+      </article>
+
+      <article class="post post--quote">
+        <blockquote>
+          Style is knowing who you are, what you want to say, and not giving a damn.
+          <cite>Gore Vidal</cite>
+        </blockquote>
+      </article>
+
+      <article class="post">
+        <a href="#" class="post-media">
+          <img src="Pictures/casual outfits/WhatsApp Image 2026-08-14 at 12.13.16.jpeg" alt="Group of men in matching black outfits with patterned trim">
+          <div class="date-badge"><span class="d">18</span><span class="m">Sep 2026</span></div>
+        </a>
+        <div class="post-body">
+          <div class="post-meta"><span><a href="#">Casual</a></span><span>By Dapper</span><span>6 Comments</span></div>
+          <h2 class="post-title"><a href="#">Matching outfits for the whole squad</a></h2>
+          <p class="post-excerpt">Coordinated looks don't have to mean suits. Black shirts with hand-finished patterned trim give a wedding crew or event group a unified, modern look that still feels relaxed.</p>
+          <a href="#" class="read-more">Read More</a>
+        </div>
+      </article>
+
+      <article class="post">
+        <a href="#" class="post-media">
+          <img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.52.05.jpeg" alt="Tailored suit look">
+          <div class="date-badge"><span class="d">27</span><span class="m">Sep 2026</span></div>
+        </a>
+        <div class="post-body">
+          <div class="post-meta"><span><a href="#">Style Guide</a></span><span>By Dapper</span><span>1 Comment</span></div>
+          <h2 class="post-title"><a href="#">Five fit details every tailored suit needs</a></h2>
+          <p class="post-excerpt">Shoulders that sit clean, a half-inch of shirt cuff, trousers with the right break — the details that separate an off-the-rack suit from one that's made for you.</p>
+          <a href="#" class="read-more">Read More</a>
+        </div>
+      </article>
+
+      <nav class="pagination" aria-label="Pagination">
+        <span class="current">1</span>
+        <a href="#">2</a>
+        <a href="#">3</a>
+        <a href="#" aria-label="Next page">&rarr;</a>
+      </nav>
+    </main>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="author-widget">
+        <img src="Pictures/tailored suit/Cover.jpeg" alt="Author">
+        <h4>Dapper Studio</h4>
+        <div class="role">Bespoke Tailoring</div>
+        <p>Made-to-measure suits, wedding wear and occasion outfits, cut and finished for the way you live.</p>
+        <div class="socials">
+          <a href="#">Instagram</a><a href="#">Facebook</a><a href="#">TikTok</a>
+        </div>
+      </div>
+
+      <div class="widget" id="search">
+        <h3 class="widget-title">Search</h3>
+        <form class="search-form" onsubmit="return false">
+          <input type="search" placeholder="Search the blog…" aria-label="Search">
+          <button type="submit" aria-label="Submit search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-title">Popular Posts</h3>
+        <ul class="popular-list">
+          <li>
+            <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.50.38.jpeg" alt=""></a>
+            <div><h5><a href="#">Choosing cloth for a winter suit</a></h5><time>Jul 21, 2026</time></div>
+          </li>
+          <li>
+            <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.51.38.jpeg" alt=""></a>
+            <div><h5><a href="#">Double-breasted, done right</a></h5><time>Aug 02, 2026</time></div>
+          </li>
+          <li>
+            <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.52.44.jpeg" alt=""></a>
+            <div><h5><a href="#">Your first fitting: what to expect</a></h5><time>Aug 30, 2026</time></div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-title">Categories</h3>
+        <ul class="cat-list">
+          <li><a href="#">Tailoring</a><span>(08)</span></li>
+          <li><a href="#">Weddings</a><span>(05)</span></li>
+          <li><a href="#">Casual</a><span>(04)</span></li>
+          <li><a href="#">Style Guide</a><span>(06)</span></li>
+          <li><a href="#">Accessories</a><span>(03)</span></li>
+        </ul>
+      </div>
+
+      <div class="newsletter">
+        <h3 class="widget-title">Newsletter</h3>
+        <p>New looks, styling notes and fitting dates — straight to your inbox.</p>
+        <form onsubmit="return false">
+          <input type="email" placeholder="Your email address" aria-label="Email address">
+          <button class="btn" type="submit">Subscribe</button>
+        </form>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-title">Tags</h3>
+        <div class="tags">
+          <a href="#">Suits</a><a href="#">Bespoke</a><a href="#">Tuxedo</a><a href="#">Wedding</a>
+          <a href="#">Pinstripe</a><a href="#">Overcoat</a><a href="#">Menswear</a><a href="#">Tailor</a>
+        </div>
+      </div>
+
+      <div class="widget">
+        <h3 class="widget-title">Archives</h3>
+        <ul class="archive-list">
+          <li><a href="#">September 2026</a></li>
+          <li><a href="#">August 2026</a></li>
+          <li><a href="#">July 2026</a></li>
+        </ul>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- Instagram strip -->
+<section class="insta-strip" aria-label="Gallery">
+  <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.50.38.jpeg" alt=""></a>
+  <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.51.02.jpeg" alt=""></a>
+  <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.51.38.jpeg" alt=""></a>
+  <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.52.05.jpeg" alt=""></a>
+  <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.52.44.jpeg" alt=""></a>
+  <a href="#"><img src="Pictures/tailored suit/WhatsApp Image 2026-08-14 at 11.53.10.jpeg" alt=""></a>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <a href="index.html" class="logo">Dapp<span>e</span>r</a>
+      <p>Bespoke tailoring, wedding suits and occasion wear — made to measure.</p>
+    </div>
+    <div>
+      <h6>Visit Us</h6>
+      <ul>
+        <li>[Street address]</li>
+        <li>[City, Postal code]</li>
+        <li><a href="mailto:hello@example.com">hello@example.com</a></li>
+      </ul>
+    </div>
+    <div>
+      <h6>Hours</h6>
+      <ul>
+        <li>Mon – Fri: 9am – 6pm</li>
+        <li>Saturday: 10am – 4pm</li>
+        <li>Sunday: By appointment</li>
+      </ul>
+    </div>
+    <div>
+      <h6>Newsletter</h6>
+      <p>Be first to hear about new collections.</p>
+      <form class="footer-news" onsubmit="return false">
+        <input type="email" placeholder="Email address" aria-label="Email address">
+        <button type="submit">Join</button>
+      </form>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>&copy; <span id="year">2026</span> Dapper. All rights reserved.</span>
+    <span><a href="#">Instagram</a> &nbsp;·&nbsp; <a href="#">Facebook</a> &nbsp;·&nbsp; <a href="#">TikTok</a></span>
+  </div>
+</footer>
+
+<a href="#" class="to-top" id="toTop" aria-label="Back to top">&uarr;</a>
+
+<script>
+  const nav = document.getElementById('mainNav');
+  document.getElementById('menuToggle').addEventListener('click', () => nav.classList.toggle('open'));
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', () => toTop.classList.toggle('show', window.scrollY > 600));
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

@@ -38,6 +38,9 @@ export const site = {
 
   currency: 'R',
 
+  // Set to true to show the light/dark toggle in the header again
+  enableDarkMode: false,
+
   // Appointment slots offered in the booking form
   appointmentTimes: ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'],
   closedWeekdays: [0], // 0 = Sunday

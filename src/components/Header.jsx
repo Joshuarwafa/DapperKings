@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useScroll } from '../hooks/useScroll'
+import { site } from '../config/site'
 import { MenuIcon, CloseIcon, SunIcon, MoonIcon } from './Icons'
 
 const links = [
@@ -51,14 +52,16 @@ export default function Header({ theme, onToggleTheme }) {
         </nav>
 
         <div className="header-actions">
-          <button
-            type="button"
-            className="icon-btn theme-toggle"
-            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            onClick={onToggleTheme}
-          >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
+          {site.enableDarkMode && (
+            <button
+              type="button"
+              className="icon-btn theme-toggle"
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              onClick={onToggleTheme}
+            >
+              {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+            </button>
+          )}
           <Link to="/book" className="btn btn--outline header-cta">
             Book a fitting
           </Link>

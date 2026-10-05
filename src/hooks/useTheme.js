@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react'
+import { site } from '../config/site'
 
-const KEY = 'dapper-theme'
+// Light is the default. Dark mode is only used when the visitor switches to it
+// with the toggle — that choice is remembered on their device.
+const KEY = 'dapper-theme-choice'
 
 const initialTheme = () => {
+  if (!site.enableDarkMode) return 'light'
   try {
-    const saved = localStorage.getItem(KEY)
-    if (saved === 'light' || saved === 'dark') return saved
+    if (localStorage.getItem(KEY) === 'dark') return 'dark'
   } catch {
-    // storage unavailable — fall back to system preference
+    // storage unavailable — use the default
   }
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return 'light'
 }
 
 export function useTheme() {
@@ -17,13 +20,18 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    try {
-      localStorage.setItem(KEY, theme)
-    } catch {
-      // ignore
-    }
   }, [theme])
 
-  const toggle = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+  const toggle = () =>
+    setTheme((current) => {
+      const next = current === 'dark' ? 'light' : 'dark'
+      try {
+        localStorage.setItem(KEY, next)
+      } catch {
+        // ignore
+      }
+      return next
+    })
+
   return [theme, toggle]
 }
